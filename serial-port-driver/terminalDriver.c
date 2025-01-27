@@ -7,7 +7,7 @@
 /*                                                   */
 /*---------------------------------------------------*/
 #include <stddef.h>
-#include "rprintf.h"
+#include "rprinf.h"
 /*---------------------------------------------------*/
 /* The purpose of this routine is to output data the */
 /* same as the standard printf function without the  */
@@ -283,16 +283,24 @@ try_next:
    }
 
 
-void putc(int data) {
-    int offset = 0;
+void putChar(int data) {
+    static int offset = 0;
     char *videobuf;
-    videobuf = (char *)0xB000 + (offset);
-    *videobuf = data;
+    videobuf = (char *)0xB000;
+    
+    videobuf[offset] = data;
+    videobuf[offset + 1] = 0x07;
+    offset += 2;   
 
-    offset += 1;
-    offset++;
-    
-    
+    if(offset >= 80 * 25 * 2) {
+        offset = 0;
+    }
+}
+
+
+int main() {
+    esp_printf(putChar, "h");
+    return 0;
 }
 
 
