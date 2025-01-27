@@ -6,8 +6,9 @@
 /* For Embedded Systems Programming, 1991            */
 /*                                                   */
 /*---------------------------------------------------*/
-#include <stddef.h>
-#include "rprinf.h"
+
+#include "rprintf.h"
+
 /*---------------------------------------------------*/
 /* The purpose of this routine is to output data the */
 /* same as the standard printf function without the  */
@@ -16,8 +17,6 @@
 /* that is unacceptable in most embedded systems.    */
 /*---------------------------------------------------*/
 
-typedef char* charptr;
-typedef void (*func_ptr)(char);
 static func_ptr out_char;
 static int do_padding;
 static int left_flag;
@@ -280,28 +279,24 @@ try_next:
       goto try_next;
       }
    va_end( argp);
-   }
+}
 
-
-void putChar(int data) {
+void putc(int data) {
     static int offset = 0;
     char *videobuf;
     videobuf = (char *)0xB000;
-    
+
     videobuf[offset] = data;
-    videobuf[offset + 1] = 0x07;
-    offset += 2;   
+    videobuf[offset + 1] = 0x70;
 
-    if(offset >= 80 * 25 * 2) {
-        offset = 0;
-    }
+    offset += 2;
+}
+
+void main() {
+    esp_printf(putc, "hello");
 }
 
 
-int main() {
-    esp_printf(putChar, "h");
-    return 0;
-}
 
 
 /*---------------------------------------------------*/
